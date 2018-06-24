@@ -1,16 +1,5 @@
 var express = require('express');
-//var mysql = require('mysql');
 var bodyParser = require('body-parser');
-//var dbconfig = require('./config/database.js');
-// var connection = mysql.createConnection({
-//     host : '172.30.1.42',
-//     user : 'root',
-//     password : 'st1021759!',
-//     port : 3306,
-//     database : 'bamboo'
-// });
-
-//connection.connect();
 
 var app = express();
 
@@ -26,15 +15,7 @@ app.get('/', function(req, res){
 
 app.use('/user', require('./routes/user'));
 
-// app.get('/users', function(req, res) {
-
-//     connection.query('select * from user', function(err, rows) {
-//         if(err) throw err;
-
-//         console.log('The solution is : ', rows);
-//         res.send(rows);
-//     });
-// });
+//app.use('/swagger-ui', express.static(path.join(__dirname, './node_modules/swagger-ui/dist')));
 
 app.listen(app.get('port'), function() {
     console.log('Express Server listening on port ' + app.get('port'));
