@@ -30,19 +30,19 @@ router.post('/login', function(req, res) {
         console.log(rows);
         if(rows.length) {
             console.log('Login Success');
-            res.send(ResultSuccess(200, rows[0].id, rows[0].nickname));
+            res.send(ResultSuccess(200, 'OK', rows[0].id, rows[0].nickname));
         }
         else {
             console.log('Login Fail');
-            res.send(ResultFail(204));
+            res.send(ResultFail(204, 'No Content'));
         }
     })
 });
 
-var ResultSuccess = function(code, pk, nickname) {
+var ResultSuccess = function(code, msg, pk, nickname) {
     var result = {'result' : 
                     { 'status' : code ,
-                      'msg' : 'OK',
+                      'msg' : msg,
                       'data' : 
                         [{  'pk' : pk,
                            'nickname' : nickname
@@ -53,10 +53,10 @@ var ResultSuccess = function(code, pk, nickname) {
     return result;
 };
 
-var ResultFail = function(code) {
+var ResultFail = function(code, msg) {
     var result = {'result' : 
                     { 'status' : code ,
-                      'msg' : 'No Content',
+                      'msg' : msg,
                       'data' : []
                     }
                 }
@@ -65,13 +65,24 @@ var ResultFail = function(code) {
 };
 
 router.post('/signup', function(req, res) {
-    var insertQuery = 'insert into user (user_id, user_password, nickname, update_at, create_at)' +
-                    'values (\'@user_id\', \'@user_password\', \'@nickname\', ' +
-                    '\'' + new Date() + '\', \'' + new Date()  
+    var insertQuery = 'insert into user (user_id, user_password, nickname, update_at, create_at) ' +
+                    'values (?, ?, ?, ?, ?)';
+    var params = [req.body.user_id, req.body.user_password, req.body.nickname, new Date(), new Date()];
 
-    connection.query('', function(err, rows) {
+    connection.query(insertQuery, params ,function(err, rows, fields) {
+        if(err) {
+            res.send(ResultFail(500, 'Internal Server Error'))
+        }
 
-    }) ;
+        console.log(rows.affectedRows);
+
+        if(rows.affectedRows > 0) {
+            res.send(ResultSuccess(201, 'Created', rows.insertId, req.body.nickname));
+        }
+        else if(rows.affectedRows == 0) {
+            res.send(ResultSuccess(500, 'Internal Server Error'));
+        }
+    });
 });
 
 module.exports = router;
